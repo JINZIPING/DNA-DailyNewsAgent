@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Mapping, Required, TypedDict
+from typing import Iterable, Mapping, TypedDict
+from typing_extensions import Required
 
 
 class AgentMessageRecord(TypedDict):

@@ -5,9 +5,10 @@ DNA-DailyNewsAgent is a lightweight multi-agent system for fetching, ranking, an
 
 ## Quick Start
 
-1. Install python dependencies from `environment.txt`
-2. Edit [config.yaml](./config.yaml) (refer to the following Set Up) (PS: turn on "resend" tool if you need email push)
-3. Run: `python -m app.main`
+1. Use Python `3.10+` (recommended: Python `3.10` or `3.11`)
+2. Install python dependencies from `requirements.txt`
+3. Edit [config.yaml](./config.yaml) (refer to the following Set Up) (PS: turn on "resend" tool and set up api if you need email push)
+4. Run: `python -m app.main`
 
 ## Set Up
 

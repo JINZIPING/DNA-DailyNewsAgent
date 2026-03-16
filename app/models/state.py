@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import NotRequired, Required, TypedDict
+from typing import TypedDict
+from typing_extensions import NotRequired, Required
 
 from app.models.article import ArticleRecord
 from app.models.message import AgentMessageRecord

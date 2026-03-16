@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Mapping, NotRequired, Required, TypedDict
+from typing import Iterable, Mapping, TypedDict
+from typing_extensions import NotRequired, Required
 
 
 class ArticleRecord(TypedDict, total=False):
