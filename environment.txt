@@ -1,0 +1,7 @@
+langgraph>=0.2.34
+openai>=1.51.0
+PyYAML>=6.0
+httpx>=0.28.0
+resend>=2.5.1
+python-dotenv>=1.0.1
+Markdown>=3.7

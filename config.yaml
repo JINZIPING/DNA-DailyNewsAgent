@@ -1,0 +1,42 @@
+model_api:
+  base_url: null
+  api_key_env: OPENAI_API_KEY
+  model: gpt-4o-mini
+  temperature: 0.4
+
+workflow:
+  output_dir: outputs
+  max_articles: 15
+  max_filtered_articles: 6
+
+scraping:
+  # Use at most 3 keywords. These are the only fetch inputs used by news_fetch tools.
+  keywords:
+    - ai
+    - ai agents
+    - ai coding
+
+tools:
+  news_fetch:
+    tools:
+      hacker_news:
+        name: hacker_news
+        enabled: true
+        base_url: https://hacker-news.firebaseio.com/v0
+
+  file_writer:
+    tools:
+      markdown:
+        name: markdown
+        enabled: true
+        base_url: null
+        api_key_env: ""
+
+  email_sender:
+    tools:
+      resend:
+        name: resend
+        enabled: false
+        api_key_env: RESEND_API_KEY
+        sender_email: onboarding@resend.dev
+        default_recipient: ""
