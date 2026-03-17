@@ -32,6 +32,7 @@ class ToolInstanceConfig:
     enabled: bool
     base_url: str | None
     api_key_env: str | None
+    subscriptions: list[str]
     default_recipient: str = ""
     sender_email: str = ""
 
@@ -99,6 +100,7 @@ def _tool_domain_config(payload: dict) -> ToolDomainConfig:
             enabled=bool(tool_payload.get("enabled", False)),
             base_url=_optional_str(tool_payload, "base_url"),
             api_key_env=_optional_str(tool_payload, "api_key_env"),
+            subscriptions=[str(item) for item in tool_payload.get("subscriptions", [])],
             default_recipient=str(tool_payload.get("default_recipient", "")),
             sender_email=str(tool_payload.get("sender_email", "")),
         )

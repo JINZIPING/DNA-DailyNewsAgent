@@ -53,12 +53,13 @@ def run(
             "revision_count": revision_count + 1,
             "messages": AgentMessage.to_dicts(messages),
         }
+    if not review["approved"]:
+        raise RuntimeError(
+            "Editor rejected the draft after "
+            f"{MAX_REVISIONS} revisions: {review['feedback']}"
+        )
 
     review_summary = str(review["summary"])
-    if not review["approved"]:
-        review_summary = (
-            f"revision limit reached; saving latest draft with unresolved issues: {review['feedback']}"
-        )
 
     slug = "_".join(keyword.lower().replace(" ", "_") for keyword in keywords) or "news_brief"
     output_path = Path(output_dir) / f"{date.today().isoformat()}_{slug}.md"
@@ -111,6 +112,13 @@ def _review_draft(keywords: list[str], draft_brief: str, filtered_article_count:
         failures.append("cite each filtered article inline with a markdown source link")
     if filtered_article_count > 0 and normalized.count("[Source:") < filtered_article_count:
         failures.append("end each news item with `[Source: SourceName](URL)`")
+    subsection_count = _count_level_three_sections(normalized)
+    if filtered_article_count > 0 and subsection_count != filtered_article_count:
+        failures.append(
+            f"write exactly {filtered_article_count} `###` news subsections, one for each filtered article"
+        )
+    if filtered_article_count > 0 and not _all_subsections_have_source_link(normalized):
+        failures.append("ensure every `###` news subsection ends with an inline markdown source link")
     if _count_paragraphs(normalized) < 3:
         failures.append("add more synthesis paragraphs instead of a thin outline")
 
@@ -136,6 +144,21 @@ def _review_draft(keywords: list[str], draft_brief: str, filtered_article_count:
 
 def _count_markdown_links(text: str) -> int:
     return len(re.findall(r"\[[^\]]+\]\([^)]+\)", text))
+
+
+def _count_level_three_sections(text: str) -> int:
+    return len(re.findall(r"(?m)^###\s+", text))
+
+
+def _all_subsections_have_source_link(text: str) -> bool:
+    sections = re.split(r"(?m)^###\s+", text)
+    subsection_bodies = sections[1:]
+    if not subsection_bodies:
+        return False
+    for body in subsection_bodies:
+        if "[Source:" not in body:
+            return False
+    return True
 
 
 def _count_paragraphs(text: str) -> int:

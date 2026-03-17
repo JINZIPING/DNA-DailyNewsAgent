@@ -9,8 +9,11 @@ import httpx
 
 
 class HackerNewsMethod:
-    BASE_URL = "https://hacker-news.firebaseio.com/v0"
+    DEFAULT_BASE_URL = "https://hacker-news.firebaseio.com/v0"
     ARTICLE_FIELDS = ("title", "url", "source", "text", "keyword_matches", "likes", "comments", "saves", "score")
+
+    def __init__(self, base_url: str | None = None) -> None:
+        self.base_url = (base_url or self.DEFAULT_BASE_URL).rstrip("/")
 
     def fetch(
         self,
@@ -19,13 +22,13 @@ class HackerNewsMethod:
     ) -> list[dict]:
         try:
             with httpx.Client(timeout=10.0) as client:
-                response = client.get(f"{self.BASE_URL}/topstories.json")
+                response = client.get(f"{self.base_url}/topstories.json")
                 response.raise_for_status()
                 story_ids = response.json()
 
                 candidates: list[dict] = []
                 for story_id in story_ids[: min(50, max(limit * 8, 20))]:
-                    item_response = client.get(f"{self.BASE_URL}/item/{story_id}.json")
+                    item_response = client.get(f"{self.base_url}/item/{story_id}.json")
                     item_response.raise_for_status()
                     item = item_response.json()
                     if not item or item.get("type") != "story" or not item.get("title"):

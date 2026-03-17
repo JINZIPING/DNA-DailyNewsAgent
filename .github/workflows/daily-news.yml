@@ -1,0 +1,39 @@
+name: Daily News Brief
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  run-daily-brief:
+    runs-on: ubuntu-latest
+
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run daily news workflow
+        run: python -m app.main
+
+      - name: Upload generated brief
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-news-brief
+          path: outputs/*.md
+          if-no-files-found: error

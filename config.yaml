@@ -23,6 +23,13 @@ tools:
         name: hacker_news
         enabled: true
         base_url: https://hacker-news.firebaseio.com/v0
+      feed_subscription:
+        name: feed_subscription
+        enabled: true
+        subscriptions:
+          - https://www.latent.space/feed
+          - https://huggingface.co/blog/feed.xml
+          - https://magazine.sebastianraschka.com/feed
 
   file_writer:
     tools:
@@ -36,7 +43,7 @@ tools:
     tools:
       resend:
         name: resend
-        enabled: false
+        enabled: true
         api_key_env: RESEND_API_KEY
         sender_email: onboarding@resend.dev
-        default_recipient: ""
+        default_recipient: mejasperj@outlook.com

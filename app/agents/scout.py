@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from app.config_loader import ToolInstanceConfig
 from app.models.article import Article
 from app.models.message import AgentMessage
 from app.models.state import WorkflowState, WorkflowUpdate
-from app.tools.news_fetch import HackerNewsMethod
+from app.tools.news_fetch import FeedSubscriptionMethod, HackerNewsMethod
 
 ARTICLE_FIELDS = ("title", "url", "source", "text", "likes", "comments", "saves", "score")
 
@@ -19,12 +20,11 @@ Operating rules:
 - avoid inventing facts or editing article content
 - preserve source URLs, source names, and popularity fields"""
 
-FETCH_TOOLS = {
-    "hacker_news": HackerNewsMethod(),
-}
-
-
-def run(state: WorkflowState, max_articles: int) -> WorkflowUpdate:
+def run(
+    state: WorkflowState,
+    max_articles: int,
+    news_fetch_tools: dict[str, ToolInstanceConfig],
+) -> WorkflowUpdate:
     keywords = _normalize_keywords(state.get("keywords", []))
     fetch_methods = state.get("fetch_methods", ["hacker_news"])
     scout_brief = _build_scout_brief(keywords, fetch_methods)
@@ -33,6 +33,7 @@ def run(state: WorkflowState, max_articles: int) -> WorkflowUpdate:
         keywords,
         max_articles,
         fetch_methods,
+        news_fetch_tools,
     )
 
     articles = Article.from_dicts(fetched_articles)
@@ -60,14 +61,27 @@ def _fetch_articles(
     keywords: list[str],
     max_articles: int,
     fetch_methods: list[str],
+    news_fetch_tools: dict[str, ToolInstanceConfig],
 ) -> list[dict]:
     articles: list[dict] = []
     for method_name in fetch_methods:
-        tool = FETCH_TOOLS.get(method_name)
+        tool = _build_fetch_tool(method_name, news_fetch_tools.get(method_name))
         if tool is None:
             continue
         articles.extend(tool.fetch(keywords, max_articles))
     return _deduplicate_articles(articles)[:max_articles]
+
+
+def _build_fetch_tool(
+    method_name: str,
+    tool_config: ToolInstanceConfig | None,
+):
+    if method_name == "hacker_news":
+        return HackerNewsMethod(base_url=tool_config.base_url if tool_config else None)
+    if method_name == "feed_subscription":
+        subscriptions = tool_config.subscriptions if tool_config else []
+        return FeedSubscriptionMethod(subscriptions=subscriptions)
+    return None
 
 
 def _deduplicate_articles(articles: list[dict]) -> list[dict]:

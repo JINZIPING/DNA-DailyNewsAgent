@@ -6,3 +6,4 @@ resend>=2.5.1
 python-dotenv>=1.0.1
 Markdown>=3.7
 typing_extensions>=4.12
+feedparser>=6.0.11

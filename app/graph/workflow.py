@@ -60,7 +60,7 @@ def _next_step_after_editor(state: WorkflowState) -> str:
 
 
 def _run_scout(state: WorkflowState, config: AppConfig):
-    return scout.run(state, config.workflow.max_articles)
+    return scout.run(state, config.workflow.max_articles, config.tools.news_fetch.tools)
 
 
 def _run_analyst(state: WorkflowState, config: AppConfig):

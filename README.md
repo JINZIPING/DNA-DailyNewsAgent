@@ -38,8 +38,9 @@ The `scraping` block controls fetch input:
 Each tool domain has its own config block under `tools`. (can add your own tools)
 
 `tools.news_fetch`
-- contains concrete fetch tools such as `hacker_news`
+- contains concrete fetch tools such as `hacker_news` and `feed_subscription`
 - each concrete tool can define `name`, `enabled`, `base_url`, and optional `api_key_env`
+- `feed_subscription` also supports `subscriptions`, which is a list of RSS/Atom feed URLs to fetch
 
 `tools.file_writer`
 - contains concrete output writers such as `markdown`
@@ -78,6 +79,7 @@ Each tool domain has its own config block under `tools`. (can add your own tools
 - Coordination: centralized orchestrator to assign tasks and pass messages between agents.
 - Tooling: `News_Fetch` uses real source methods such as Hacker News.
 - Fetch methods: `config.yaml` enables concrete tools under `tools.news_fetch.tools`; the Scout invokes the enabled fetch tools directly.
+- Feed subscriptions: users can add their own RSS/Atom source URLs under `tools.news_fetch.tools.feed_subscription.subscriptions`.
 - Permissions: tool access is declared directly in each agent module instead of a shared registry layer.
 - Tool structure: `news_fetch`, `file_writer`, and `email_sender` each live in their own folder so additional methods can be added without flattening the tools directory.
 - Tool config: each tool domain contains multiple concrete tools, and each concrete tool uses the same base config fields: `name`, `enabled`, `base_url`, and `api_key_env`.
