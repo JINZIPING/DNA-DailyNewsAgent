@@ -1,0 +1,134 @@
+name: Daily Brief
+
+on:
+  schedule:
+    # GitHub cron uses UTC. 00:00 UTC is 08:00 China Standard Time.
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dna-daily-brief
+  cancel-in-progress: false
+
+jobs:
+  daily-brief:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      AGENTMAIL_API_KEY: ${{ secrets.AGENTMAIL_API_KEY }}
+      AGENTMAIL_INBOX_ID: ${{ secrets.AGENTMAIL_INBOX_ID }}
+      RSSHUB_GITHUB_ACCESS_TOKEN: ${{ secrets.RSSHUB_GITHUB_ACCESS_TOKEN }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      OPENROUTER_BASE_URL: ${{ secrets.OPENROUTER_BASE_URL }}
+      OPENROUTER_MODEL: ${{ secrets.OPENROUTER_MODEL }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          enable-cache: true
+
+      - name: Install project
+        run: uv sync
+
+      - name: Validate required secrets
+        shell: bash
+        run: |
+          required=(
+            AGENTMAIL_API_KEY
+            AGENTMAIL_INBOX_ID
+            RSSHUB_GITHUB_ACCESS_TOKEN
+            OPENROUTER_API_KEY
+            OPENROUTER_BASE_URL
+            OPENROUTER_MODEL
+          )
+          for name in "${required[@]}"; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Missing required Actions secret: $name"
+              exit 1
+            fi
+          done
+
+      - name: Pull RSSHub image
+        run: docker pull diygod/rsshub:chromium-bundled
+
+      - name: Prepare ranked stories
+        run: |
+          uv run dailynews prepare \
+            --sources config/sources.json \
+            --hot-words config/ranking.json \
+            --since-hours 24 \
+            --fallback-hours 72 \
+            --min-items 3 \
+            --min-sources 2 \
+            --max-per-source 3 \
+            --limit 7 \
+            --out output/ranked.json
+
+      - name: Generate daily brief
+        run: |
+          uv run dailynews summarize \
+            --in output/ranked.json \
+            --out output/brief.json \
+            --max-items 7
+
+      - name: Render email
+        run: |
+          uv run dailynews render-email \
+            --in output/brief.json \
+            --out output/brief.html
+
+      - name: Validate generated output
+        run: |
+          uv run python - <<'PY'
+          import json
+          from pathlib import Path
+
+          ranked = json.loads(Path("output/ranked.json").read_text())
+          brief = json.loads(Path("output/brief.json").read_text())
+          html = Path("output/brief.html").read_text()
+
+          assert 1 <= len(ranked) <= 7, "ranked story count must be between 1 and 7"
+          assert len(brief.get("stories", [])) == len(ranked), "brief must preserve every ranked story"
+          assert all(story.get("source_url") for story in brief["stories"]), "every story needs a source URL"
+          assert "DNA DAILY BRIEF" in html, "email header is missing"
+          assert html.count("Read source") == len(ranked), "email source link count is incorrect"
+          print(f"Validated {len(ranked)} stories across {len({item['source_id'] for item in ranked})} sources")
+          PY
+
+      - name: Send email
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DAILYNEWS_RECIPIENT: ${{ secrets.DAILYNEWS_RECIPIENT }}
+        run: |
+          if [[ -z "$RESEND_API_KEY" || -z "$DAILYNEWS_RECIPIENT" ]]; then
+            echo "::error::Missing RESEND_API_KEY or DAILYNEWS_RECIPIENT"
+            exit 1
+          fi
+          uv run dailynews send-email \
+            --brief output/brief.json \
+            --html output/brief.html \
+            --to "$DAILYNEWS_RECIPIENT"
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dna-daily-brief-${{ github.run_id }}
+          path: output/
+          if-no-files-found: ignore
+          retention-days: 7

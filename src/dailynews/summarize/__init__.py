@@ -1,0 +1,2 @@
+"""Grounded brief generation."""
+

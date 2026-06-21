@@ -1,0 +1,92 @@
+{
+  "sources": [
+    {
+      "id": "agentmail-inbox",
+      "type": "agentmail",
+      "name": "AgentMail Inbox",
+      "enabled": true,
+      "limit": 50,
+      "exclude_subject_prefixes": [
+        "confirm ",
+        "verify ",
+        "welcome ",
+        "test ",
+        "check from "
+      ]
+    },
+    {
+      "id": "ai-era-baai",
+      "type": "rss",
+      "name": "新智元 / AI Era",
+      "url": "https://link.baai.ac.cn/@AI_era.rss",
+      "enabled": true,
+      "limit": 50
+    },
+    {
+      "id": "anthropic-research-rsshub",
+      "type": "rsshub",
+      "name": "Anthropic Research",
+      "url": "rsshub://anthropic/research",
+      "enabled": true,
+      "limit": 50,
+      "timeout": 120
+    },
+    {
+      "id": "github-trending-daily",
+      "type": "rsshub",
+      "name": "GitHub Trending Daily",
+      "url": "rsshub://github/trending/daily/any",
+      "enabled": true,
+      "limit": 25,
+      "timeout": 90
+    },
+    {
+      "id": "openai-news",
+      "type": "rss",
+      "name": "OpenAI News",
+      "url": "https://openai.com/news/rss.xml",
+      "enabled": true,
+      "limit": 50
+    },
+    {
+      "id": "latent-space",
+      "type": "rss",
+      "name": "Latent Space",
+      "url": "https://www.latent.space/feed",
+      "enabled": true,
+      "limit": 50
+    },
+    {
+      "id": "hugging-face-blog",
+      "type": "rss",
+      "name": "Hugging Face Blog",
+      "url": "https://huggingface.co/blog/feed.xml",
+      "enabled": true,
+      "limit": 50
+    },
+    {
+      "id": "sebastian-raschka",
+      "type": "rss",
+      "name": "Sebastian Raschka",
+      "url": "https://magazine.sebastianraschka.com/feed",
+      "enabled": true,
+      "limit": 50
+    },
+    {
+      "id": "last-week-in-ai",
+      "type": "rss",
+      "name": "Last Week in AI",
+      "url": "https://lastweekin.ai/feed",
+      "enabled": true,
+      "limit": 50
+    },
+    {
+      "id": "hacker-news-topstories",
+      "type": "api",
+      "name": "Hacker News Top Stories",
+      "url": "https://hacker-news.firebaseio.com/v0",
+      "enabled": false,
+      "limit": 50
+    }
+  ]
+}

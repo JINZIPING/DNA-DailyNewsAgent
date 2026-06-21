@@ -1,0 +1,15 @@
+{
+  "hot_words": [
+    { "term": "ai", "weight": 6 },
+    { "term": "ai agent", "weight": 10 },
+    { "term": "agentic coding", "weight": 10 },
+    { "term": "coding agent", "weight": 10 },
+    { "term": "llm", "weight": 6 },
+    { "term": "model", "weight": 5 },
+    { "term": "research", "weight": 5 },
+    { "term": "eval", "weight": 5 },
+    { "term": "openai", "weight": 8 },
+    { "term": "anthropic", "weight": 8 },
+    { "term": "claude", "weight": 8 }
+  ]
+}
