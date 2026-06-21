@@ -1,0 +1,2 @@
+"""Core shared models."""
+
