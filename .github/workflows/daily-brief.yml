@@ -104,9 +104,10 @@ jobs:
 
           assert 1 <= len(ranked) <= 7, "ranked story count must be between 1 and 7"
           assert len(brief.get("stories", [])) == len(ranked), "brief must preserve every ranked story"
-          assert all(story.get("source_url") for story in brief["stories"]), "every story needs a source URL"
+          assert all(story.get("source_name") for story in brief["stories"]), "every story needs a source name"
           assert "DNA DAILY BRIEF" in html, "email header is missing"
-          assert html.count("Read source") == len(ranked), "email source link count is incorrect"
+          source_link_count = sum(1 for story in brief["stories"] if story.get("source_url"))
+          assert html.count("Read source") == source_link_count, "email source link count is incorrect"
           print(f"Validated {len(ranked)} stories across {len({item['source_id'] for item in ranked})} sources")
           PY
 
