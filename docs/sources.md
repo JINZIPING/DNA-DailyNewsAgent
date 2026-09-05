@@ -7,6 +7,7 @@ This table is for review and lightweight CRUD by editing rows. Runtime config sh
 | ID | Type | Name | URL | Enabled | Topics | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | agentmail-inbox | email | AgentMail Inbox | env:AGENTMAIL_INBOX_ID | yes | newsletters | Inbound newsletter collector; uses `AGENTMAIL_API_KEY` |
+| ai-weekly | rss | AI Weekly | https://aiweekly.co/feed | yes | ai, agents, research, policy, newsletter | Tracks what AI experts are reading and sharing; publishes three times per week |
 | ai-era-baai | rss | 新智元 / AI Era | https://link.baai.ac.cn/@AI_era.rss | yes | ai, cn-ai | Mastodon RSS feed; posts link to BAAI Hub articles |
 | anthropic-research-rsshub | rsshub | Anthropic Research | rsshub://anthropic/research | yes | ai, anthropic, research | Requires one-time/local RSSHub |
 | github-trending-daily | rsshub | GitHub Trending Daily | rsshub://github/trending/daily/any | yes | development, trending | Requires one-time/local RSSHub and `RSSHUB_GITHUB_ACCESS_TOKEN` |
